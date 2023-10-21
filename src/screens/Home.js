@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Text from '../components/text/text'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PlanetHeader from '../components/planetHeader';
 import { colors } from '../theme/colors';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { PLANET_LIST } from '../data/planetList';
 import { spacing } from '../theme/spacing';
 import { AntDesign } from '@expo/vector-icons';
@@ -30,15 +30,33 @@ const PlanetItem = ({item}) => {
 }
 
 export default function Home({ navigation }) {
+  const [list, setList] = useState(PLANET_LIST);
   const renderItem = ({ item }) => {
     return <PlanetItem item={item} />
+  }
+
+  const searchFilter =  (text) => {
+    const filterItme = PLANET_LIST.filter((item) => {
+      const itemName = item.name.toLowerCase();
+      const userTypedText = text.toLowerCase();
+
+      return itemName.indexOf(userTypedText) > -1;
+    })
+    setList(filterItme)
   }
   return (
     <SafeAreaView style={styles.container}>
       <PlanetHeader />
+      <TextInput 
+      placeholder='Type the planet name'
+      placeholderTextColor={colors.white}
+      autoCorrect={false}
+      style={styles.searchInput}
+      onChangeText={(text) => searchFilter(text)}
+      />
       <FlatList
         contentContainerStyle={styles.list}
-        data={PLANET_LIST}
+        data={list}
         keyExtractor={(item) => item.name}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separetor} />}
@@ -78,6 +96,13 @@ const styles = StyleSheet.create({
   separetor: {
     borderBottomColor: colors.white,
     borderWidth: 0.5
+  },
+  searchInput: {
+    padding: spacing[4],
+    color: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.white,
+    margin: spacing[5]
   }
 })
 
